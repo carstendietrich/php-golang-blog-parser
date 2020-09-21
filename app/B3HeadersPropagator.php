@@ -13,7 +13,10 @@ class B3HeadersPropagator implements PropagatorInterface
     private const X_B3_TRACE_ID = 'X-B3-TraceId';
     private const X_B3_SPAN_ID = 'X-B3-SpanId';
     private const X_B3_SAMPLED = 'X-B3-Sampled';
-    private const X_B3_FLAGS = 'X-B3-Flags';
+    private const HTTP_X_B3_TRACE_ID = 'HTTP_X_B3_TRACEID';
+    private const HTTP_X_B3_SPAN_ID = 'HTTP_X_B3_SPANID';
+    private const HTTP_X_B3_SAMPLED = 'HTTP_X_B3_SAMPLED';
+    private const HTTP_X_B3_FLAGS = 'HTTP_X_B3_FLAGS';
 
     /**
      * Extract the SpanContext from some container
@@ -23,12 +26,12 @@ class B3HeadersPropagator implements PropagatorInterface
      */
     public function extract($container)
     {
-        // TODO: check what flamingo is sending..
-        $headers = getallheaders();
-        $traceId = $container[self::X_B3_TRACE_ID] ?? null;
-        $spanId = $container[self::X_B3_SPAN_ID] ?? null;
-        $sampled = $container[self::X_B3_SAMPLED] ?? null;
-        $flags = $container[self::X_B3_FLAGS] ?? null;
+        $traceId = $container[self::HTTP_X_B3_TRACE_ID] ?? null;
+        $spanId = $container[self::HTTP_X_B3_SPAN_ID] ?? null;
+        $sampled = $container[self::HTTP_X_B3_SAMPLED] ?? null;
+        $flags = $container[self::HTTP_X_B3_FLAGS] ?? null;
+
+        error_log('traceid: '.$traceId.' sampeled: '.$sampled);
 
         if (!$traceId || !$spanId) {
             return new SpanContext();
@@ -56,10 +59,15 @@ class B3HeadersPropagator implements PropagatorInterface
      */
     public function inject(SpanContext $context, $container)
     {
+        if (headers_sent() === false) {
+            header(self::X_B3_TRACE_ID. ': '.$context->traceId());
+            header(self::X_B3_SAMPLED. ': '.$context->enabled() ? 1 : 0);
+            header(self::X_B3_SPAN_ID. ': '.$context->spanId());
+        }
         return [
-                self::X_B3_TRACE_ID => $context->traceId(),
-                self::X_B3_SPAN_ID => $context->spanId(),
-                self::X_B3_SAMPLED => $context->enabled() ? 1 : 0,
+                self::HTTP_X_B3_TRACE_ID => $context->traceId(),
+                self::HTTP_X_B3_SPAN_ID => $context->spanId(),
+                self::HTTP_X_B3_SAMPLED => $context->enabled() ? 1 : 0,
             ] + $container;
     }
 
