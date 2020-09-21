@@ -19,6 +19,8 @@ WORKDIR /app
 
 ADD . .
 
+RUN chmod -R 777 /app/storage/logs
+
 RUN composer global require hirak/prestissimo
 RUN composer install --no-dev --no-interaction -o
 

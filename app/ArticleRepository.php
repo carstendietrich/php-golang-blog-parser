@@ -68,18 +68,16 @@ class ArticleRepository
     /**
      * @param string $id
      * @return Article
-     * @throws ArticleNotFoundException
      */
     public static function getByID(string $id): Article
     {
-        Tracer::inSpan(['name' => 'Search for single article'], static function () use ($id) {
+        return Tracer::inSpan(['name' => 'Search for single article'], static function () use ($id) {
             foreach (self::getAll() as $article) {
                 if ($article->id === $id) {
                     return $article;
                 }
             }
+            throw new ArticleNotFoundException('Article with id: ' . $id . ' not found in blog.');
         });
-
-        throw new ArticleNotFoundException('Article with id: ' . $id . ' not found in blog.');
     }
 }
