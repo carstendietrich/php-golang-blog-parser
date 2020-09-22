@@ -31,8 +31,6 @@ class B3HeadersPropagator implements PropagatorInterface
         $sampled = $container[self::HTTP_X_B3_SAMPLED] ?? null;
         $flags = $container[self::HTTP_X_B3_FLAGS] ?? null;
 
-        error_log('traceid: '.$traceId.' sampeled: '.$sampled);
-
         if (!$traceId || !$spanId) {
             return new SpanContext();
         }
@@ -61,7 +59,7 @@ class B3HeadersPropagator implements PropagatorInterface
     {
         if (headers_sent() === false) {
             header(self::X_B3_TRACE_ID. ': '.$context->traceId());
-            header(self::X_B3_SAMPLED. ': '.$context->enabled() ? 1 : 0);
+            header(self::X_B3_SAMPLED. ': '.($context->enabled() ? 1 : 0));
             header(self::X_B3_SPAN_ID. ': '.$context->spanId());
         }
         return [
