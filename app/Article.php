@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App;
-
 
 use DateTimeImmutable;
 use JsonSerializable;

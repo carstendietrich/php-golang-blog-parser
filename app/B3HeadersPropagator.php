@@ -24,7 +24,7 @@ class B3HeadersPropagator implements PropagatorInterface
      * @param mixed $container
      * @return SpanContext
      */
-    public function extract($container)
+    public function extract($container): SpanContext
     {
         $traceId = $container[self::HTTP_X_B3_TRACE_ID] ?? null;
         $spanId = $container[self::HTTP_X_B3_SPAN_ID] ?? null;
@@ -55,12 +55,12 @@ class B3HeadersPropagator implements PropagatorInterface
      * @param mixed $container
      * @return array
      */
-    public function inject(SpanContext $context, $container)
+    public function inject(SpanContext $context, $container): array
     {
         if (headers_sent() === false) {
-            header(self::X_B3_TRACE_ID. ': '.$context->traceId());
-            header(self::X_B3_SAMPLED. ': '.($context->enabled() ? 1 : 0));
-            header(self::X_B3_SPAN_ID. ': '.$context->spanId());
+            header(self::X_B3_TRACE_ID . ': ' . $context->traceId());
+            header(self::X_B3_SAMPLED . ': ' . ($context->enabled() ? 1 : 0));
+            header(self::X_B3_SPAN_ID . ': ' . $context->spanId());
         }
         return [
                 self::HTTP_X_B3_TRACE_ID => $context->traceId(),

@@ -4,7 +4,6 @@ use App\ArticleRepository;
 use Laravel\Lumen\Routing\Router;
 use OpenCensus\Trace\Tracer;
 
-
 /** @var Router $router */
 $router->get('/', function () {
     return Tracer::inSpan(['name' => 'Render index'], static function () {
